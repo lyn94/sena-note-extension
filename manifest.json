@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "새나노트전용 폰트 바꾸기",
+  "version": "1.0",
+  "description": "새나노트 폰트 바꾸고 싶어서 만든 익스텐션",
+  "permissions": ["scripting", "storage", "activeTab"],
+  "content_scripts": [
+    {
+      "matches": ["https://sena-note.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "64": "icon.png",
+    "128": "icon.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "64": "icon.png",
+      "128": "icon.png"
+    }
+  }
+}
