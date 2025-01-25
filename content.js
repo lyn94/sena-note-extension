@@ -1,15 +1,29 @@
 let isEnabled = true; // 팝업에서 받는 상태
+let targetFont = "font-nanumStudent";
+let toBeReplaced = "font-pretendard";
 
 function changeClasses() {
-  const elements = document.querySelectorAll(".font-nanumStudent");
+  const elements = document.querySelectorAll(`.${targetFont}`);
   console.log("Found elements:", elements.length, elements);
 
   elements.forEach((element) => {
     try {
-      element.classList.remove("font-nanumStudent");
-      element.classList.add("font-pretendard");
+      element.classList.remove(targetFont);
+      element.classList.add(toBeReplaced);
     } catch (e) {
       console.error("에러발생!!!!::::", e);
+    }
+  });
+}
+
+function revertClasses() {
+  const elements = document.querySelectorAll(`.${toBeReplaced}`);
+  elements.forEach((element) => {
+    try {
+      element.classList.remove(toBeReplaced);
+      element.classList.add(targetFont);
+    } catch (e) {
+      console.error("Error reverting class:", e);
     }
   });
 }
@@ -57,9 +71,10 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
   if (namespace === "sync" && changes.isEnabled) {
     isEnabled = changes.isEnabled.newValue;
 
-    // 상태가 true로 변경되면 초기화
     if (isEnabled) {
       initialize();
+    } else {
+      revertClasses();
     }
   }
 });
