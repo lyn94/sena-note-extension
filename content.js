@@ -1,17 +1,15 @@
-let isEnabled = true; // 익스텐션 팝업에서 상태 변경
+let isEnabled = true; // 팝업에서 받는 상태
 
-// 클래스 변경
 function changeClasses() {
   const elements = document.querySelectorAll(".font-nanumStudent");
   console.log("Found elements:", elements.length, elements);
 
   elements.forEach((element) => {
-    console.log("Processing element:", element.tagName, element);
     try {
       element.classList.remove("font-nanumStudent");
       element.classList.add("font-pretendard");
     } catch (e) {
-      console.error("Error changing class:", e);
+      console.error("에러발생!!!!::::", e);
     }
   });
 }
@@ -20,29 +18,19 @@ function changeClasses() {
 const observer = new MutationObserver((mutations) => {
   if (!isEnabled) return;
 
-  let shouldUpdate = false;
-  mutations.forEach((mutation) => {
-    // class 속성이 변경되었거나 새로운 노드가 추가된 경우
-    if (
+  let shouldUpdate = mutations.some(
+    (mutation) =>
       (mutation.type === "attributes" && mutation.attributeName === "class") ||
       mutation.type === "childList"
-    ) {
-      shouldUpdate = true;
-    }
-  });
+  );
 
   if (shouldUpdate) {
     setTimeout(changeClasses, 100);
   }
 });
 
-// 초기 설정
 function initialize() {
-  console.log("Initializing class changer...");
-
   changeClasses();
-
-  // DOM 변경 감지 시작
   observer.observe(document.body, {
     childList: true, // 자식 요소 추가/제거 감지
     subtree: true, // 모든 하위 요소 감지
@@ -51,17 +39,15 @@ function initialize() {
   });
 }
 
-// 페이지 로드 완료 후 초기화
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", () => {
-    console.log("DOM Content Loaded");
     setTimeout(initialize, 500);
   });
 } else {
   initialize();
 }
 
-// 스토리지 상태 확인 및 초기화
+// 초기 상태 로드
 chrome.storage.sync.get("isEnabled", function (data) {
   isEnabled = data.isEnabled ?? true;
 });
@@ -70,21 +56,14 @@ chrome.storage.sync.get("isEnabled", function (data) {
 chrome.storage.onChanged.addListener(function (changes, namespace) {
   if (namespace === "sync" && changes.isEnabled) {
     isEnabled = changes.isEnabled.newValue;
+
+    // 상태가 true로 변경되면 초기화
     if (isEnabled) {
       initialize();
     }
   }
 });
 
-// 1초마다 isEnabled 상태인지 확인
-setInterval(() => {
-  if (isEnabled) {
-    changeClasses();
-  }
-}, 1000); // 1초마다 확인
-
-// 페이지가 완전히 로드된 후 한 번 더 실행
 window.addEventListener("load", () => {
-  console.log("로드 완료");
   setTimeout(changeClasses, 3000);
 });
